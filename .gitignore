@@ -8,7 +8,6 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
-dist
 dist-ssr
 *.local
 
@@ -25,6 +24,3 @@ dist-ssr
 
 # Audio files (already in public)
 /public/audio/
-
-# Build output
-dist/
