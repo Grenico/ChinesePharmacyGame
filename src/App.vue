@@ -1051,7 +1051,10 @@ export default {
   methods: {
     // 添加用户交互监听器，解决Chrome自动播放限制
     setupAudioPlayback() {
-      // 检查是否已经有用户交互
+      // 首先尝试自动播放音乐
+      this.tryAutoPlay();
+      
+      // 同时添加用户交互监听器作为备用方案
       if (!this.hasUserInteraction) {
         // 为文档添加点击事件，首次交互时播放音乐
         const handleFirstInteraction = () => {
@@ -1070,6 +1073,16 @@ export default {
         document.addEventListener('touchstart', handleFirstInteraction);
         document.addEventListener('keydown', handleFirstInteraction);
       }
+    },
+    
+    // 尝试自动播放音乐
+    tryAutoPlay() {
+      if (!this.soundEnabled || this.hasUserInteraction) return;
+      
+      // 尝试播放标题音乐
+      this.playTitleMusic().catch(e => {
+        console.log('自动播放失败，等待用户交互:', e);
+      });
     },
 
     // 初始化音频系统
@@ -1206,9 +1219,10 @@ export default {
     
     // 播放标题音乐
     playTitleMusic() {
-      if (!this.soundEnabled || !this.titleMusic) return;
-      this.titleMusic.play().catch(e => {
+      if (!this.soundEnabled || !this.titleMusic) return Promise.resolve();
+      return this.titleMusic.play().catch(e => {
         console.log('标题音乐播放失败:', e);
+        return Promise.reject(e);
       });
     },
     
