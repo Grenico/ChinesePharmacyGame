@@ -1154,14 +1154,20 @@ export default {
       // 为不同浏览器提供兼容的音频格式
       const audio = new Audio();
       
-      // 尝试加载MP3格式（Chrome、Firefox支持）
-      audio.src = './audio/background/title.mp3';
+      // 使用绝对路径，确保在不同页面中都能正确加载
+      audio.src = '/audio/background/title.mp3';
       audio.loop = true;
       audio.volume = this.musicVolume;
       
       // 添加错误处理
-      audio.addEventListener('error', () => {
-        console.log('标题音乐加载失败，尝试其他格式');
+      audio.addEventListener('error', (e) => {
+        console.log('标题音乐加载失败:', e);
+        console.log('音频路径:', audio.src);
+      });
+      
+      // 确保音频加载完成
+      audio.addEventListener('canplaythrough', () => {
+        console.log('标题音乐加载完成');
       });
       
       this.titleMusic = audio;
@@ -1172,14 +1178,20 @@ export default {
       // 为不同浏览器提供兼容的音频格式
       const audio = new Audio();
       
-      // 尝试加载WAV格式（大多数浏览器支持）
-      audio.src = './audio/background/game-background.wav';
+      // 使用绝对路径，确保在不同页面中都能正确加载
+      audio.src = '/audio/background/game-background.wav';
       audio.loop = true;
       audio.volume = this.musicVolume;
       
       // 添加错误处理
-      audio.addEventListener('error', () => {
-        console.log('背景音乐加载失败，尝试其他格式');
+      audio.addEventListener('error', (e) => {
+        console.log('背景音乐加载失败:', e);
+        console.log('音频路径:', audio.src);
+      });
+      
+      // 确保音频加载完成
+      audio.addEventListener('canplaythrough', () => {
+        console.log('背景音乐加载完成');
       });
       
       this.backgroundMusic = audio;
