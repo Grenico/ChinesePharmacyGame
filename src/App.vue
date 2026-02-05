@@ -266,6 +266,7 @@ export default {
       musicVolume: 0.2,
       // 音频对象缓存
       audioCache: {},
+      hasUserInteraction: false,
       languages: [
         { code: 'zh', name: '中文' },
         { code: 'en', name: 'English' },
@@ -1028,8 +1029,30 @@ export default {
     // 页面加载时初始化音频系统
     this.initAudio();
     
-    // 播放标题音乐
-    this.playTitleMusic();
+    // 添加用户交互监听器，解决Chrome自动播放限制
+    this.setupAudioPlayback();
+  },
+  
+  setupAudioPlayback() {
+    // 检查是否已经有用户交互
+    if (!this.hasUserInteraction) {
+      // 为文档添加点击事件，首次交互时播放音乐
+      const handleFirstInteraction = () => {
+        if (!this.hasUserInteraction) {
+          this.hasUserInteraction = true;
+          this.playTitleMusic();
+          // 移除监听器，避免重复触发
+          document.removeEventListener('click', handleFirstInteraction);
+          document.removeEventListener('touchstart', handleFirstInteraction);
+          document.removeEventListener('keydown', handleFirstInteraction);
+        }
+      };
+      
+      // 添加多种交互事件监听器，确保在各种情况下都能触发
+      document.addEventListener('click', handleFirstInteraction);
+      document.addEventListener('touchstart', handleFirstInteraction);
+      document.addEventListener('keydown', handleFirstInteraction);
+    }
   },
   
   beforeUnmount() {
@@ -1128,17 +1151,37 @@ export default {
 
     // 加载标题音乐
     loadTitleMusic() {
-      const audio = new Audio('./audio/background/title.mp3');
+      // 为不同浏览器提供兼容的音频格式
+      const audio = new Audio();
+      
+      // 尝试加载MP3格式（Chrome、Firefox支持）
+      audio.src = './audio/background/title.mp3';
       audio.loop = true;
       audio.volume = this.musicVolume;
+      
+      // 添加错误处理
+      audio.addEventListener('error', () => {
+        console.log('标题音乐加载失败，尝试其他格式');
+      });
+      
       this.titleMusic = audio;
     },
     
     // 加载背景音乐
     loadBackgroundMusic() {
-      const audio = new Audio('./audio/background/game-background.wav');
+      // 为不同浏览器提供兼容的音频格式
+      const audio = new Audio();
+      
+      // 尝试加载WAV格式（大多数浏览器支持）
+      audio.src = './audio/background/game-background.wav';
       audio.loop = true;
       audio.volume = this.musicVolume;
+      
+      // 添加错误处理
+      audio.addEventListener('error', () => {
+        console.log('背景音乐加载失败，尝试其他格式');
+      });
+      
       this.backgroundMusic = audio;
     },
     
