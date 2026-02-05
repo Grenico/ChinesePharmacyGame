@@ -1251,7 +1251,8 @@ export default {
       audio.autobuffer = true; // 兼容旧浏览器
       
       // 使用相对路径，确保在GitHub Pages子路径部署时也能正确加载
-      audio.src = 'audio/background/game-background.wav';
+      // 直接使用MP3格式，因为它更小，加载更快
+      audio.src = 'audio/background/game-background.mp3';
       audio.loop = true;
       audio.volume = this.musicVolume;
       
@@ -1260,15 +1261,8 @@ export default {
         console.log('背景音乐加载失败:', e);
         console.log('音频路径:', audio.src);
         // 尝试备用路径
-        audio.src = './audio/background/game-background.wav';
+        audio.src = './audio/background/game-background.mp3';
         console.log('尝试备用路径:', audio.src);
-        // 尝试MP3格式作为备选
-        setTimeout(() => {
-          if (audio.error) {
-            audio.src = 'audio/background/game-background.mp3';
-            console.log('尝试MP3格式:', audio.src);
-          }
-        }, 100);
       });
       
       // 确保音频加载完成
