@@ -1201,6 +1201,10 @@ export default {
       // 为不同浏览器提供兼容的音频格式
       const audio = new Audio();
       
+      // 预加载音频，解决Firefox卡顿问题
+      audio.preload = 'auto';
+      audio.autobuffer = true; // 兼容旧浏览器
+      
       // 使用相对路径，确保在GitHub Pages子路径部署时也能正确加载
       audio.src = 'audio/background/title.mp3';
       audio.loop = true;
@@ -1218,6 +1222,20 @@ export default {
       // 确保音频加载完成
       audio.addEventListener('canplaythrough', () => {
         console.log('标题音乐加载完成');
+        // 加载完成后尝试自动播放，解决Chrome/IE问题
+        if (!this.hasUserInteraction && this.gameState === 'title') {
+          this.playTitleMusic().catch(e => {
+            console.log('加载完成后自动播放失败:', e);
+          });
+        }
+      });
+      
+      // 监控音频播放状态，解决卡顿
+      audio.addEventListener('stalled', () => {
+        console.log('音频播放卡顿，尝试恢复');
+        if (!audio.paused) {
+          audio.play().catch(e => console.log('恢复播放失败:', e));
+        }
       });
       
       this.titleMusic = audio;
@@ -1227,6 +1245,10 @@ export default {
     loadBackgroundMusic() {
       // 为不同浏览器提供兼容的音频格式
       const audio = new Audio();
+      
+      // 预加载音频，解决Firefox卡顿问题
+      audio.preload = 'auto';
+      audio.autobuffer = true; // 兼容旧浏览器
       
       // 使用相对路径，确保在GitHub Pages子路径部署时也能正确加载
       audio.src = 'audio/background/game-background.wav';
@@ -1240,11 +1262,26 @@ export default {
         // 尝试备用路径
         audio.src = './audio/background/game-background.wav';
         console.log('尝试备用路径:', audio.src);
+        // 尝试MP3格式作为备选
+        setTimeout(() => {
+          if (audio.error) {
+            audio.src = 'audio/background/game-background.mp3';
+            console.log('尝试MP3格式:', audio.src);
+          }
+        }, 100);
       });
       
       // 确保音频加载完成
       audio.addEventListener('canplaythrough', () => {
         console.log('背景音乐加载完成');
+      });
+      
+      // 监控音频播放状态，解决卡顿
+      audio.addEventListener('stalled', () => {
+        console.log('音频播放卡顿，尝试恢复');
+        if (!audio.paused) {
+          audio.play().catch(e => console.log('恢复播放失败:', e));
+        }
       });
       
       this.backgroundMusic = audio;
@@ -1269,9 +1306,12 @@ export default {
     
     // 播放背景音乐
     playBackgroundMusic() {
-      if (!this.soundEnabled || !this.backgroundMusic) return;
-      this.backgroundMusic.play().catch(e => {
+      if (!this.soundEnabled || !this.backgroundMusic) return Promise.resolve();
+      return this.backgroundMusic.play().catch(e => {
         console.log('背景音乐播放失败:', e);
+        // 尝试使用Web Audio API来绕过自动播放限制
+        this.tryWebAudioAutoPlay();
+        return Promise.reject(e);
       });
     },
     
