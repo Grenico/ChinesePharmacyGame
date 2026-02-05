@@ -1060,7 +1060,10 @@ export default {
         const handleFirstInteraction = () => {
           if (!this.hasUserInteraction) {
             this.hasUserInteraction = true;
-            this.playTitleMusic();
+            // 只有在标题状态时才播放标题音乐
+            if (this.gameState === 'title') {
+              this.playTitleMusic();
+            }
             // 移除监听器，避免重复触发
             document.removeEventListener('click', handleFirstInteraction);
             document.removeEventListener('touchstart', handleFirstInteraction);
@@ -1082,7 +1085,37 @@ export default {
       // 尝试播放标题音乐
       this.playTitleMusic().catch(e => {
         console.log('自动播放失败，等待用户交互:', e);
+        // 对于Chrome和IE，尝试使用Web Audio API来绕过自动播放限制
+        this.tryWebAudioAutoPlay();
       });
+    },
+    
+    // 尝试使用Web Audio API自动播放（绕过Chrome/IE限制）
+    tryWebAudioAutoPlay() {
+      if (!this.audioContext || this.hasUserInteraction) return;
+      
+      // 创建一个静音的音频上下文激活
+      const oscillator = this.audioContext.createOscillator();
+      const gainNode = this.audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(this.audioContext.destination);
+      
+      // 设置音量为0，避免产生声音
+      gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+      
+      // 播放一小段静音音频来激活音频上下文
+      oscillator.start(this.audioContext.currentTime);
+      oscillator.stop(this.audioContext.currentTime + 0.01);
+      
+      // 音频上下文激活后，再次尝试播放标题音乐
+      setTimeout(() => {
+        if (!this.hasUserInteraction && this.gameState === 'title') {
+          this.playTitleMusic().catch(e => {
+            console.log('Web Audio API自动播放也失败:', e);
+          });
+        }
+      }, 50);
     },
 
     // 初始化音频系统
@@ -1501,6 +1534,7 @@ export default {
       
       // 停止标题音乐，播放游戏内背景音乐
       this.stopTitleMusic();
+      this.stopBackgroundMusic(); // 确保背景音乐也被停止，避免重叠
       this.playBackgroundMusic();
       
       // 开始订单生成器
