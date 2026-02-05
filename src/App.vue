@@ -1033,28 +1033,6 @@ export default {
     this.setupAudioPlayback();
   },
   
-  setupAudioPlayback() {
-    // 检查是否已经有用户交互
-    if (!this.hasUserInteraction) {
-      // 为文档添加点击事件，首次交互时播放音乐
-      const handleFirstInteraction = () => {
-        if (!this.hasUserInteraction) {
-          this.hasUserInteraction = true;
-          this.playTitleMusic();
-          // 移除监听器，避免重复触发
-          document.removeEventListener('click', handleFirstInteraction);
-          document.removeEventListener('touchstart', handleFirstInteraction);
-          document.removeEventListener('keydown', handleFirstInteraction);
-        }
-      };
-      
-      // 添加多种交互事件监听器，确保在各种情况下都能触发
-      document.addEventListener('click', handleFirstInteraction);
-      document.addEventListener('touchstart', handleFirstInteraction);
-      document.addEventListener('keydown', handleFirstInteraction);
-    }
-  },
-  
   beforeUnmount() {
     // 移除全局点击事件监听器
     document.removeEventListener('click', this.handleGlobalClick);
@@ -1071,6 +1049,29 @@ export default {
     }
   },
   methods: {
+    // 添加用户交互监听器，解决Chrome自动播放限制
+    setupAudioPlayback() {
+      // 检查是否已经有用户交互
+      if (!this.hasUserInteraction) {
+        // 为文档添加点击事件，首次交互时播放音乐
+        const handleFirstInteraction = () => {
+          if (!this.hasUserInteraction) {
+            this.hasUserInteraction = true;
+            this.playTitleMusic();
+            // 移除监听器，避免重复触发
+            document.removeEventListener('click', handleFirstInteraction);
+            document.removeEventListener('touchstart', handleFirstInteraction);
+            document.removeEventListener('keydown', handleFirstInteraction);
+          }
+        };
+        
+        // 添加多种交互事件监听器，确保在各种情况下都能触发
+        document.addEventListener('click', handleFirstInteraction);
+        document.addEventListener('touchstart', handleFirstInteraction);
+        document.addEventListener('keydown', handleFirstInteraction);
+      }
+    },
+
     // 初始化音频系统
     initAudio() {
       if (!this.audioContext) {
@@ -1154,8 +1155,8 @@ export default {
       // 为不同浏览器提供兼容的音频格式
       const audio = new Audio();
       
-      // 使用绝对路径，确保在不同页面中都能正确加载
-      audio.src = '/audio/background/title.mp3';
+      // 使用相对路径，确保在GitHub Pages子路径部署时也能正确加载
+      audio.src = 'audio/background/title.mp3';
       audio.loop = true;
       audio.volume = this.musicVolume;
       
@@ -1163,6 +1164,9 @@ export default {
       audio.addEventListener('error', (e) => {
         console.log('标题音乐加载失败:', e);
         console.log('音频路径:', audio.src);
+        // 尝试备用路径
+        audio.src = './audio/background/title.mp3';
+        console.log('尝试备用路径:', audio.src);
       });
       
       // 确保音频加载完成
@@ -1178,8 +1182,8 @@ export default {
       // 为不同浏览器提供兼容的音频格式
       const audio = new Audio();
       
-      // 使用绝对路径，确保在不同页面中都能正确加载
-      audio.src = '/audio/background/game-background.wav';
+      // 使用相对路径，确保在GitHub Pages子路径部署时也能正确加载
+      audio.src = 'audio/background/game-background.wav';
       audio.loop = true;
       audio.volume = this.musicVolume;
       
@@ -1187,6 +1191,9 @@ export default {
       audio.addEventListener('error', (e) => {
         console.log('背景音乐加载失败:', e);
         console.log('音频路径:', audio.src);
+        // 尝试备用路径
+        audio.src = './audio/background/game-background.wav';
+        console.log('尝试备用路径:', audio.src);
       });
       
       // 确保音频加载完成
