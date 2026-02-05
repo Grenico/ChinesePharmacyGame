@@ -4,5 +4,5 @@ import vue from '@vitejs/plugin-vue'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [vue()],
-  base: '/ChinesePharmacyGame/',
+  base: './', // 使用相对路径，避免构建时路径错误
 })
