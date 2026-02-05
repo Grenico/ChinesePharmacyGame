@@ -1065,7 +1065,7 @@ export default {
         return;
       }
       
-      const audio = new Audio('/audio/cooking/boiling.mp3');
+      const audio = new Audio('./audio/cooking/boiling.mp3');
       audio.loop = false;
       audio.volume = this.soundVolume * 0.9;
       audio.addEventListener('canplaythrough', () => {
@@ -1080,17 +1080,14 @@ export default {
     // 加载音效
     loadSoundEffects() {
       const sounds = [
-        { key: 'button-hover', path: '/audio/sounds/button-hover.mp3' },
-        { key: 'button-click', path: '/audio/sounds/button-click.mp3' },
-        { key: 'cooking-complete', path: '/audio/sounds/cooking-complete.mp3' },
-        { key: 'herb-book', path: '/audio/ui/herb-book.mp3' },
-        { key: 'medicine-cabinet', path: '/audio/ui/medicine-cabinet.mp3' },
-        { key: 'cauldron-click', path: '/audio/ui/cauldron-click.mp3' },
-        { key: 'radical-click', path: '/audio/ui/radical-click.mp3' },
-        { key: 'order-timeout', path: '/audio/ui/order-timeout.mp3' },
-        { key: 'game-over', path: '/audio/ui/game-over.mp3' },
-        { key: 'remove-herb', path: '/audio/ui/remove-herb.mp3' },
-        { key: 'clear-cauldron', path: '/audio/ui/clear-cauldron.mp3' }
+        { key: 'cooking-complete', path: './audio/sounds/cooking-complete.mp3' },
+        { key: 'herb-book', path: './audio/ui/herb-book.mp3' },
+        { key: 'medicine-cabinet', path: './audio/ui/medicine-cabinet.mp3' },
+        { key: 'cauldron-click', path: './audio/ui/cauldron-click.mp3' },
+        { key: 'radical-click', path: './audio/ui/radical-click.mp3' },
+        { key: 'order-timeout', path: './audio/ui/order-timeout.mp3' },
+        { key: 'game-over', path: './audio/ui/game-over.mp3' },
+        { key: 'clear-cauldron', path: './audio/ui/clear-cauldron.mp3' }
       ];
       
       sounds.forEach(sound => {
@@ -1131,7 +1128,7 @@ export default {
 
     // 加载标题音乐
     loadTitleMusic() {
-      const audio = new Audio('audio/background/title.mp3');
+      const audio = new Audio('./audio/background/title.mp3');
       audio.loop = true;
       audio.volume = this.musicVolume;
       this.titleMusic = audio;
@@ -1139,7 +1136,7 @@ export default {
     
     // 加载背景音乐
     loadBackgroundMusic() {
-      const audio = new Audio('audio/background/game-background.wav');
+      const audio = new Audio('./audio/background/game-background.wav');
       audio.loop = true;
       audio.volume = this.musicVolume;
       this.backgroundMusic = audio;
@@ -1216,8 +1213,6 @@ export default {
 
       // 优先使用加载的音效文件
       const soundMap = {
-        'hover': 'button-hover',
-        'click': 'button-click',
         'cooking-complete': 'cooking-complete',
         'herb-book': 'herb-book',
         'medicine-cabinet': 'medicine-cabinet',
@@ -1225,7 +1220,6 @@ export default {
         'radical-click': 'radical-click',
         'order-timeout': 'order-timeout',
         'game-over': 'game-over',
-        'remove-herb': 'remove-herb',
         'clear-cauldron': 'clear-cauldron'
       };
 
